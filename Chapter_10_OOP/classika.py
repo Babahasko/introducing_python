@@ -439,4 +439,250 @@ CoyoteWeapon.commercial()
 чтобы получить доступ к этому методу. И это замечательно."""
 
 header_1("Утиная типизация")
-#213
+"""В Python имеется также реализация полиморфизма — это значит, 
+что одна операция может быть произведена над разными объектами, 
+основываясь на имени метода и его аргументах, независимо от их класса."""
+
+
+class Quote:
+    def __init__(self, person, words):
+        self.person = person
+        self.words = words
+    def who(self):
+        return self.person
+    def says(self):
+        return self.words + '.'
+
+
+class QuestionQuote(Quote):
+    def says(self):
+        return self.words + '?'
+
+
+class ExclamationQuote(Quote):
+    def says(self):
+        return self.words + '!'
+
+hunter = Quote('ElemFudd', 'I`m hunting rabbits')
+print(hunter.who(), 'says: ', hunter.says())
+
+hunter_1 = QuestionQuote('Bug Bunny', 'Hey, wasssap')
+print(hunter_1.who(), 'says: ', hunter_1.says())
+
+hunter_2 = Quote('Alen Ford', 'I like cars')
+print(hunter_2.who(), 'says: ', hunter_2.says())
+
+"""Это был типичный пример полиморфизма - один
+и тот же метод в разных классах. Но Python пошел дальше и позволяет
+вызывать методы who() и says() для любых объектов, в том числе
+и для этих методов."""
+
+print('--'*10)
+print('Зайдем немного глубже')
+class BagglinBrook:
+    def who(self):
+        return 'Gruut'
+    def says(self):
+        return 'I`m GRUUUT'
+
+
+brook = BagglinBrook()
+
+
+def who_says(obj):
+    print(obj.who(), 'says:', obj.says())
+
+
+who_says(hunter)
+who_says(hunter_1)
+who_says(hunter_2)
+who_says(brook)
+
+header_2('Магические методы')
+
+
+class Word:
+    def __init__(self, text):
+        self.text = text
+
+    def equals(self, word2):
+        return self.text.lower() == word2.text.lower()
+
+first = Word('HA')
+second = Word('ha')
+third = Word('eh')
+print(first.equals(second))
+print(first.equals(third))
+
+
+class Word:
+    def __init__(self, text):
+        self.text = text
+
+    def __eq__(self, word2):
+        return self.text.lower() == word2.text.lower()
+
+    def __str__(self):
+        return f'Word {self.text}'
+
+    def __repr__(self):
+        return self.text
+
+
+first = Word('HA')
+second = Word('ha')
+third = Word('eh')
+print(first == second)
+print(first == third)
+print(first)
+
+
+header_2('Агрегирование и композиция')
+
+"""Наследование может сослужить хорошую службу, 
+когда вы хотите, чтобы класс-потомок бо'льшую часть 
+времени вел себя как родительский класс (потомок является родителем). 
+Возможность создавать иерархии наследования довольно заманчива, но 
+иногда композиция или агрегирование имеет больше смысла. В чем разница? 
+При композиции один объект является частью другого. Утка является птицей (наследование), 
+но имеет хвост (композиция)."""
+
+
+class Bill:
+    def __init__(self, description):
+        self.description = description
+
+
+class Tail:
+    def __init__(self, length):
+        self.length = length
+
+
+class Duck:
+    def __init__(self, bill, tail):
+        self.bill = bill
+        self.tail = tail
+
+    def about(self):
+        print('This duck has a', self.bill.description, 'bill and a', self.tail.length, 'tail')
+
+
+a_tail = Tail('long')
+a_bill = Bill('wide orange')
+duck = Duck(a_bill, a_tail)
+duck.about()
+
+"""Агрегирование выражает более свободные отношения между объектами: 
+один из них использует другой, но оба они существуют независимо друг 
+от друга. Утка использует озеро, но не является его частью."""
+
+header_2("Когда использовать объекты,а когда — что-то другое")
+"""Рассмотрим несколько рекомендаций, которые помогут вам понять, 
+где лучше разместить свой код и данные — в классе, в модуле или в
+чем-то совершенно ином."""
+print("Объекты наиболее полезны, когда вам нужно иметь несколько "
+      "отдельных экземпляров с одинаковым поведением (методы), но"
+      "разным внутренним состоянием (атрибуты).")
+print('Классы, в отличие от модулей, поддерживают наследование')
+print('Если вам нужен только один объект, модуль может быть лучшим'
+      'выбором. Независимо от того, сколько обращений к модулю имеется в'
+      'программе, загрузится только одна копия.')
+print("""Если у вас есть несколько переменных, которые содержат разные 
+      значения и могут быть переданы в качестве аргументов в несколько 
+      функций, лучше всего определить их как классы. Например, вы можете 
+      использовать словарь с ключами size и color, чтобы представить цветное 
+      изображение. Вы можете создать разные словари для каждого изображения 
+      в программе и передавать их в качестве аргументов в функции scale() и 
+      transform(). Правда, по мере добавления новых ключей и функций разбираться 
+      со всем этим станет трудно. Поэтому более предпочтительно определить класс 
+      Image с атрибутами size или color и методами scale() и transform(). Тогда 
+      все данные и методы для работы с цветными изображениями будут определены в одном месте.""")
+print("""Используйте самые простые решения. Словарь, список или кортеж проще, компактнее и быстрее, 
+чем модуль, который, в свою очередь, проще, чем класс. Совет от Гвидо ван Россума: «Избегайте усложнения 
+структур данных. Кортежи лучше объектов (можно воспользоваться именованными кортежами). 
+Предпочитайте простые поля функциям, геттерам и сеттерам. (Встроенные типы данных — ваши друзья.) 
+Используйте больше чисел, строк, кортежей, списков, множеств, словарей. Взгляните также на библиотеку 
+collections, особенно на класс deque».""")
+print("""Более новой альтернативой является класс данных""")
+
+header_2("Именованные кортежи")
+
+from collections import namedtuple
+Duck = namedtuple('Duck', 'bill tail')
+duck = Duck('wide orange', 'long')
+print(duck)
+print(duck.bill)
+print(duck.tail)
+
+parts = {'bill' : 'wide orange', 'tail': 'long'}
+duck2 = Duck(**parts)
+print(duck2)
+
+duck3 = duck2._replace(tail='magnificent', bill='crushing')
+print(duck3)
+
+duck_dict = {'bill':'wide orange', 'tail': 'long'}
+print(duck_dict)
+duck_dict['color'] = 'green'  #  Можно добавить поле в словарь
+print(duck_dict)
+#duck.color = 'green' # Но нельзя добавить в именованный кортеж
+print('Плюсы именованных кортежей:')
+print("""1.Они выглядят и действуют как неизменяемый объект.
+2.Они более эффективны, чем объекты, с точки зрения времени и занимаемого места.
+3.Вы можете получить доступ к атрибутам, используя точки, а не квадратные скобки, характерные для словарей.
+4.Вы можете использовать их как ключ словаря.""")
+
+header_2('Классы данных')
+print("""Многие люди создают объекты для хранения данных (с помощью атрибутов объектов), а 
+не для задания определенного поведения (с помощью методов). Вы уже видели, как именованные 
+кортежи могут стать альтернативным хранилищем данных.""")
+class TeenyClass:
+    def __init__(self,name):
+        self._name = name
+    @property
+    def name(self):
+        return self._name
+
+teeny = TeenyClass('itsy')
+print(teeny.name)
+print('Реализация с помощью классов данных')
+from dataclasses import dataclass
+@dataclass
+class TeenyClass:
+    name: str
+
+
+teeny = TeenyClass('bitsy')
+print(teeny.name)
+print("""Помимо декоратора @dataclass, вам нужно определить атрибуты 
+класса с помощью аннотаций переменных (https://www.python.org/dev/peps/pep-0526/). 
+Это выглядит как имя: тип или имя: тип = значение, например color: str или color: str = "red". 
+Типом может быть любой тип объектов в Python, включая созданные вами классы, а не только 
+встроенные, такие как str или int.""")
+print("""Когда вы создаете объект класса данных, вы предоставляете аргументы в том порядке, 
+в котором они указаны в классе, или используете именованные аргументы, передавая их в любом порядке:""")
+@dataclass
+class AnimalClass:
+    name: str
+    habitat: str
+    teeth: int = 0
+
+snowman = AnimalClass('yeti', 'Himalayas', 46)
+duck = AnimalClass(habitat='lake', name='duck')
+print(snowman)
+print(duck)
+print('Вы можете обращаться к атрибутам этого объекта точно так же, как и к атрибутам других объектов:')
+print(duck.habitat)
+print(snowman.teeth)
+print("""О классах данных можно говорить еще долго. Обратитесь к этому руководству 
+(https://realpython.com/python-data-classes/) или прочтите официальную (довольно объемную) 
+документацию (https://www.python.org/dev/peps/pep-0557/).""")
+
+header_2('attrs')
+print("""Именованные кортежи и классы данных предлагают альтернативное решение, которое можно встретить в стандартной библиотеке, — если вам нужно создать простую коллекцию данных, проще всего воспользоваться этими вариантами.
+В статье The One Python Library Everyone Needs (https://glyph.twistedmatrix.com/
+2016/08/attrs.html) сравниваются простые классы, именованные кортежи и классы данных. 
+В ней по множеству причин рекомендуется использовать сторонний пакет attrs (https://oreil.ly/Rdwlx), 
+который позволяет меньше набирать, меньше проверять данные и т. д. Взгляните сами и решите для себя, 
+что вам больше нравится — эта библиотека или встроенные решения.""")
+
